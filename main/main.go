@@ -28,6 +28,7 @@ type Handler struct {
 func NewHandler(stdout io.Writer, calculator *calc.Addition) *Handler {
 	return &Handler{stdout, calculator}
 }
+
 func (this *Handler) Handle(args []string) error {
 	if len(args) != 2 {
 		return errWrongArgCount
@@ -42,8 +43,14 @@ func (this *Handler) Handle(args []string) error {
 	}
 	result := this.calculator.Calculate(a, b)
 	_, err = fmt.Fprint(this.stdout, result)
+	if err != nil {
+		return fmt.Errorf("%w: %w", errOutputFailure, err)
+	}
 	return nil
 }
 
-var errWrongArgCount = errors.New("usage: calculator <a> <b>")
-var errInvalidArgument = errors.New("invalid argument")
+var (
+	errWrongArgCount   = errors.New("usage: calculator <a> <b>")
+	errInvalidArgument = errors.New("invalid argument")
+	errOutputFailure   = errors.New("output failure")
+)
